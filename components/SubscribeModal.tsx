@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import MarkedList from '@jsamr/react-native-li';
 import disc from '@jsamr/counter-style/presets/disc';
+import { defaultStyles } from '@/constants/Styles';
 
 export type Ref = BottomSheetModal;
 
@@ -103,7 +104,14 @@ const SubscribeModal = forwardRef<Ref>((props, ref) => {
           </Text>
         </BottomSheetScrollView>
 
-        <View></View>
+        <View style={[styles.footer, { paddingBottom: bottom }]}>
+          <TouchableOpacity style={defaultStyles.btn}>
+            <Text style={defaultStyles.btnText}>Try 7 days free</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerText}>
+            2,99 $/month after 7-day trial. Cancel anytime.
+          </Text>
+        </View>
       </View>
     </BottomSheetModal>
   );
@@ -151,5 +159,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     lineHeight: 18,
     marginBottom: 20,
+  },
+  footer: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 1.84,
+    elevation: 5,
+  },
+  footerText: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingTop: 10,
+    color: '#484848',
   },
 });
