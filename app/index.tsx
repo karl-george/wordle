@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '@/assets/images/wordle-icon.svg';
 import { Link } from 'expo-router';
+import { format } from 'date-fns';
 
 export default function Index() {
   return (
@@ -33,7 +34,11 @@ export default function Index() {
       </View>
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.text}>Made by Karl</Text>
+        <Text style={styles.footerDate}>
+          {format(new Date(), 'MMMM d, yyyy')}
+        </Text>
+        <Text style={styles.footerText}>No. 1151</Text>
+        <Text style={styles.footerText}>Edited by Karl G</Text>
       </View>
     </View>
   );
@@ -82,5 +87,15 @@ const styles = StyleSheet.create({
   primaryText: {
     color: '#fff',
   },
-  footer: {},
+  footer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+  },
+  footerDate: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
