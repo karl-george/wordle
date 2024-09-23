@@ -10,14 +10,22 @@ import { Link } from 'expo-router';
 import { format } from 'date-fns';
 import { Colors } from '@/constants/Colors';
 import ThemedText from '@/components/ThemedText';
+import { useRef } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import SubscribeModal from '@/components/SubscribeModal';
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
   const textColor = Colors[colorScheme ?? 'light'].text;
+  const subscribeModalRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentSubscribeModal = () =>
+    subscribeModalRef.current?.present();
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <SubscribeModal ref={subscribeModalRef} />
       {/* Header */}
       <View style={styles.header}>
         <Icon width={100} height={70} />
@@ -45,7 +53,10 @@ export default function Index() {
           <ThemedText style={styles.btnText}>Log in</ThemedText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, { borderColor: textColor }]}>
+        <TouchableOpacity
+          style={[styles.button, { borderColor: textColor }]}
+          onPress={handlePresentSubscribeModal}
+        >
           <ThemedText style={styles.btnText}>Subscribe</ThemedText>
         </TouchableOpacity>
       </View>
