@@ -49,9 +49,15 @@ export default function Index() {
           </TouchableOpacity>
         </Link>
 
-        <TouchableOpacity style={[styles.button, { borderColor: textColor }]}>
-          <ThemedText style={styles.btnText}>Log in</ThemedText>
-        </TouchableOpacity>
+        <Link
+          href={'/login'}
+          style={[styles.button, { borderColor: textColor }]}
+          asChild
+        >
+          <TouchableOpacity>
+            <ThemedText style={styles.btnText}>Log in</ThemedText>
+          </TouchableOpacity>
+        </Link>
 
         <TouchableOpacity
           style={[styles.button, { borderColor: textColor }]}
