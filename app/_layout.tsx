@@ -13,10 +13,13 @@ import {
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Touchable, TouchableOpacity, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
 import { tokenCache } from '@/utils/cache';
+import Logo from '@/assets/images/nyt-logo.svg';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -57,7 +60,12 @@ export default function RootLayout() {
                 <Stack.Screen name='index' options={{ headerShown: false }} />
                 <Stack.Screen
                   name='login'
-                  options={{ presentation: 'modal' }}
+                  options={{
+                    presentation: 'modal',
+                    headerShadowVisible: false,
+                    headerTitle: () => <Logo height={40} width={150} />,
+                    headerTitleAlign: 'center',
+                  }}
                 />
               </Stack>
             </BottomSheetModalProvider>
