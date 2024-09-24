@@ -30,7 +30,24 @@ const Page = () => {
     strategy: Strategy.Facebook,
   });
 
-  const onSelectAuth = async (strategy: Strategy) => {};
+  const onSelectAuth = async (strategy: Strategy) => {
+    const selectedAuth = {
+      [Strategy.Google]: googleAuth,
+      [Strategy.Apple]: appleAuth,
+      [Strategy.Facebook]: facebookAuth,
+    }[strategy];
+
+    try {
+      const { createdSessionId, setActive } = await selectedAuth();
+
+      if (createdSessionId) {
+        setActive!({ session: createdSessionId });
+        router.back();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
