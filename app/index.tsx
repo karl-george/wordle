@@ -13,12 +13,14 @@ import ThemedText from '@/components/ThemedText';
 import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SubscribeModal from '@/components/SubscribeModal';
+import { SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const backgroundColor = Colors[colorScheme ?? 'light'].background;
   const textColor = Colors[colorScheme ?? 'light'].text;
   const subscribeModalRef = useRef<BottomSheetModal>(null);
+  const { signOut } = useAuth();
 
   const handlePresentSubscribeModal = () =>
     subscribeModalRef.current?.present();
@@ -36,6 +38,7 @@ export default function Index() {
       </View>
       {/* Menu Buttons */}
       <View style={styles.menu}>
+        {/* Play */}
         <Link
           href='/game'
           asChild
@@ -48,17 +51,28 @@ export default function Index() {
             <Text style={[styles.btnText, styles.primaryText]}>Play</Text>
           </TouchableOpacity>
         </Link>
-
-        <Link
-          href={'/login'}
-          style={[styles.button, { borderColor: textColor }]}
-          asChild
-        >
-          <TouchableOpacity>
-            <ThemedText style={styles.btnText}>Log in</ThemedText>
+        <SignedOut>
+          {/* Login */}
+          <Link
+            href={'/login'}
+            style={[styles.button, { borderColor: textColor }]}
+            asChild
+          >
+            <TouchableOpacity>
+              <ThemedText style={styles.btnText}>Log in</ThemedText>
+            </TouchableOpacity>
+          </Link>
+        </SignedOut>
+        <SignedIn>
+          {/* Log out */}
+          <TouchableOpacity
+            style={[styles.button, { borderColor: textColor }]}
+            onPress={() => signOut()}
+          >
+            <ThemedText style={styles.btnText}>Sign out</ThemedText>
           </TouchableOpacity>
-        </Link>
-
+        </SignedIn>
+        {/* Subscribe */}
         <TouchableOpacity
           style={[styles.button, { borderColor: textColor }]}
           onPress={handlePresentSubscribeModal}
