@@ -3,7 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, useColorScheme, View } from 'react-native';
-import OnScreenKeyboard from '../components/OnScreenKeyboard';
+import OnScreenKeyboard, {
+  BACKSPACE,
+  ENTER,
+} from '../components/OnScreenKeyboard';
 import { allWords } from '@/utils/allWords';
 import { words } from '@/utils/targetWords';
 
@@ -46,9 +49,32 @@ const Page = () => {
   const router = useRouter();
 
   const addKey = (key: string) => {
-    console.log('addKey', key);
-    // todo
+    const newRows = [...rows.map((row) => [...row])];
+
+    if (key === ENTER) {
+      checkWord();
+    } else if (key === BACKSPACE) {
+      if (colStateRef.current === 0) {
+        newRows[currentRow][0] = '';
+        setRows(newRows);
+        return;
+      }
+
+      newRows[currentRow][colStateRef.current - 1] = '';
+      setCurrentColumn(colStateRef.current - 1);
+      setRows(newRows);
+      return;
+    } else if (colStateRef.current >= newRows[currentRow].length) {
+      // EOL dont add key
+      return;
+    } else {
+      newRows[currentRow][colStateRef.current] = key;
+      setRows(newRows);
+      setCurrentColumn(colStateRef.current + 1);
+    }
   };
+
+  const checkWord = () => {};
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
