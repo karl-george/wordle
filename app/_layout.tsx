@@ -67,6 +67,13 @@ export default function RootLayout() {
                     headerTitleAlign: 'center',
                   }}
                 />
+                <Stack.Screen
+                  name='game'
+                  options={{
+                    headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
+                    title: '',
+                  }}
+                />
               </Stack>
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
