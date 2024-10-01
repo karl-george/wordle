@@ -1,9 +1,11 @@
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, useColorScheme, View } from 'react-native';
 import OnScreenKeyboard from '../components/OnScreenKeyboard';
+import { allWords } from '@/utils/allWords';
+import { words } from '@/utils/targetWords';
 
 const ROWS = 6;
 const COLUMNS = 5;
@@ -14,12 +16,26 @@ const Page = () => {
     new Array(ROWS).fill(new Array(COLUMNS).fill(''))
   );
   const [currentRow, setCurrentRow] = useState(0);
-  const [currentColumn, setCurrentColumn] = useState(0);
+  const [currentColumn, _setCurrentColumn] = useState(0);
+
+  const colStateRef = useRef(currentColumn);
+  const setCurrentColumn = (col: number) => {
+    colStateRef.current = col;
+    _setCurrentColumn(col);
+  };
 
   // State for coloured letters
   const [greenLetters, setGreenLetters] = useState<string[]>([]);
   const [yellowLetters, setYellowLetters] = useState<string[]>([]);
   const [grayLetters, setGrayLetters] = useState<string[]>([]);
+
+  // State for target word
+  // const [word, setWord] = useState<string>(
+  //   words[Math.floor(Math.random() * words.length)]
+  // );
+
+  const [word, setWord] = useState<string>('hello');
+  const wordLetters = word.split('');
 
   // Theme colour scheme
   const colorScheme = useColorScheme();
