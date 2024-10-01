@@ -1,9 +1,9 @@
-import { StyleSheet, Text, useColorScheme, View } from 'react-native';
-import React, { useState } from 'react';
 import { Colors } from '@/constants/Colors';
-import { Stack, useRouter } from 'expo-router';
-import OnScreenKeyboard from '../components/OnScreenKeyboard';
 import { Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, useColorScheme, View } from 'react-native';
+import OnScreenKeyboard from '../components/OnScreenKeyboard';
 
 const ROWS = 6;
 const COLUMNS = 5;
@@ -62,7 +62,12 @@ const Page = () => {
           </View>
         ))}
       </View>
-      <OnScreenKeyboard />
+      <OnScreenKeyboard
+        onKeyPressed={addKey}
+        greenLetters={greenLetters}
+        yellowLetters={yellowLetters}
+        grayLetters={grayLetters}
+      />
     </View>
   );
 };
