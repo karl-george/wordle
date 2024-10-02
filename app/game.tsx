@@ -10,7 +10,7 @@ import OnScreenKeyboard, {
 import { allWords } from '@/utils/allWords';
 import { words } from '@/utils/targetWords';
 
-const ROWS = 6;
+const ROWS = 1;
 const COLUMNS = 5;
 
 const Page = () => {
@@ -110,10 +110,14 @@ const Page = () => {
     setTimeout(() => {
       if (currentWord === word) {
         console.log('word found');
-        // todo go to end screen
+        router.push(
+          `/end?win=true&word=${word}&gameField=${JSON.stringify(rows)}`
+        );
       } else if (currentRow + 1 >= rows.length) {
         console.log('game over');
-        // todo go to end screen
+        router.push(
+          `/end?win=false&word=${word}&gameField=${JSON.stringify(rows)}`
+        );
       }
     }, 0);
 
