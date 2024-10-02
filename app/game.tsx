@@ -74,7 +74,52 @@ const Page = () => {
     }
   };
 
-  const checkWord = () => {};
+  const checkWord = () => {
+    const currentWord = rows[currentRow].join('');
+
+    if (currentWord.length < word.length) {
+      console.log('Not enough letters');
+      // Todo show error
+      return;
+    }
+
+    if (!allWords.includes(currentWord)) {
+      console.log('Not a word');
+      // todo show error
+      // return
+    }
+
+    const newGreenLetters: string[] = [];
+    const newYellowLetters: string[] = [];
+    const newGrayLetters: string[] = [];
+
+    currentWord.split('').forEach((letter, index) => {
+      if (letter === wordLetters[index]) {
+        newGreenLetters.push(letter);
+      } else if (wordLetters.includes(letter)) {
+        newYellowLetters.push(letter);
+      } else {
+        newGrayLetters.push(letter);
+      }
+    });
+
+    setGreenLetters([...greenLetters, ...newGreenLetters]);
+    setYellowLetters([...yellowLetters, ...newYellowLetters]);
+    setGrayLetters([...grayLetters, ...newGrayLetters]);
+
+    setTimeout(() => {
+      if (currentWord === word) {
+        console.log('word found');
+        // todo go to end screen
+      } else if (currentRow + 1 >= rows.length) {
+        console.log('game over');
+        // todo go to end screen
+      }
+    }, 0);
+
+    setCurrentRow(currentRow + 1);
+    setCurrentColumn(0);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
