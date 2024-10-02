@@ -175,7 +175,14 @@ const Page = () => {
                   },
                 ]}
               >
-                <Text style={styles.cellText}>{cell}</Text>
+                <Text
+                  style={[
+                    styles.cellText,
+                    { color: currentRow > rowIndex ? '#fff' : textColor },
+                  ]}
+                >
+                  {cell}
+                </Text>
               </View>
             ))}
           </View>
