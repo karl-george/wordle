@@ -121,6 +121,29 @@ const Page = () => {
     setCurrentColumn(0);
   };
 
+  const getCellColor = (cell: string, rowIndex: number, cellIndex: number) => {
+    if (currentRow > rowIndex) {
+      if (wordLetters[cellIndex] === cell) {
+        return Colors.light.green;
+      } else if (yellowLetters.includes(cell)) {
+        return Colors.light.yellow;
+      } else if (grayLetters.includes(cell)) {
+        return grayColor;
+      }
+    }
+    return 'transparent';
+  };
+  const getBorderColor = (
+    cell: string,
+    rowIndex: number,
+    cellIndex: number
+  ) => {
+    if (currentRow > rowIndex && cell !== '') {
+      return getCellColor(cell, rowIndex, cellIndex);
+    }
+    return Colors.light.gray;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <Stack.Screen
@@ -142,7 +165,16 @@ const Page = () => {
         {rows.map((row, rowIndex) => (
           <View key={`row-${rowIndex}`} style={styles.gameFieldRow}>
             {row.map((cell, cellIndex) => (
-              <View key={`cell-${rowIndex}-${cellIndex}`} style={styles.cell}>
+              <View
+                key={`cell-${rowIndex}-${cellIndex}`}
+                style={[
+                  styles.cell,
+                  {
+                    backgroundColor: getCellColor(cell, rowIndex, cellIndex),
+                    borderColor: getBorderColor(cell, rowIndex, cellIndex),
+                  },
+                ]}
+              >
                 <Text style={styles.cellText}>{cell}</Text>
               </View>
             ))}
