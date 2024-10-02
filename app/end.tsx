@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as MailComposer from 'expo-mail-composer';
 
 const Page = () => {
   const { win, word, gameField } = useLocalSearchParams<{
@@ -20,7 +21,71 @@ const Page = () => {
     currentStreak: 1,
   });
 
-  const shareGame = () => {};
+  const shareGame = () => {
+    const game = JSON.parse(gameField!);
+    const imageText: string[][] = [];
+
+    const wordLetters = word.split('');
+
+    game.forEach((row: string[], rowIndex: number) => {
+      imageText.push([]);
+      row.forEach((letter, colIndex) => {
+        if (wordLetters[colIndex] === letter) {
+          imageText[rowIndex].push('🟩');
+        } else if (wordLetters.includes(letter)) {
+          imageText[rowIndex].push('🟨');
+        } else {
+          imageText[rowIndex].push('⬜');
+        }
+      });
+    });
+
+    console.log(imageText);
+
+    const html = `
+    <html>
+      <head>
+        <style>
+
+          .game {
+            display: flex;
+            flex-direction: column;
+          }
+            .row {
+            display: flex;
+            flex-direction: row;
+
+            }
+          .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+        </style>
+      </head>
+      <body>
+        <h1>Wordle</h1>
+        <div class="game">
+         ${imageText
+           .map(
+             (row) =>
+               `<div class="row">${row
+                 .map((cell) => `<div class="cell">${cell}</div>`)
+                 .join('')}</div>`
+           )
+           .join('')}
+        </div>
+      </body>
+    </html>
+  `;
+
+    MailComposer.composeAsync({
+      subject: 'I just played Wordle',
+      body: html,
+      isHtml: true,
+    });
+  };
 
   const navigateRoot = () => {
     router.dismissAll();
