@@ -2,7 +2,13 @@ import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 import OnScreenKeyboard, {
   BACKSPACE,
   ENTER,
@@ -12,7 +18,7 @@ import { words } from '@/utils/targetWords';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SettingsModal from '@/components/SettingsModal';
 
-const ROWS = 1;
+const ROWS = 6;
 const COLUMNS = 5;
 
 const Page = () => {
