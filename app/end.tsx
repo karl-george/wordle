@@ -1,11 +1,13 @@
 import Icon from '@/assets/images/wordle-icon.svg';
 import { Colors } from '@/constants/Colors';
-import { SignedIn, SignedOut } from '@clerk/clerk-expo';
+import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as MailComposer from 'expo-mail-composer';
+import { FIRESTORE_DB } from '@/utils/FirebaseConfig';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const Page = () => {
   const { win, word, gameField } = useLocalSearchParams<{
@@ -15,11 +17,47 @@ const Page = () => {
   }>();
 
   const router = useRouter();
-  const [userScore, setUserScore] = React.useState<any>({
-    played: 42,
-    wins: 2,
-    currentStreak: 1,
-  });
+  const [userScore, setUserScore] = React.useState<any>();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      updateHighscore();
+    }
+  }, [user]);
+
+  const updateHighscore = async () => {
+    if (!user) return;
+
+    const docRef = doc(FIRESTORE_DB, `highscores/${user.id}`);
+    const docSnap = await getDoc(docRef);
+
+    let newScore = {
+      played: 1,
+      wins: win === 'true' ? 1 : 0,
+      lastGame: win === 'true' ? 'win' : 'loss',
+      currentStreak: win === 'true' ? 1 : 0,
+    };
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      newScore = {
+        played: data.played + 1,
+        wins: win === 'true' ? data.wins + 1 : data.wins,
+        lastGame: win === 'true' ? 'win' : 'loss',
+        currentStreak:
+          win === 'true' && data.lastGame === 'win'
+            ? data.currentStreak + 1
+            : win === 'true'
+            ? 1
+            : 0,
+      };
+    }
+
+    await setDoc(docRef, newScore);
+    setUserScore(newScore);
+  };
 
   const shareGame = () => {
     const game = JSON.parse(gameField!);
@@ -132,15 +170,15 @@ const Page = () => {
           <Text style={styles.text}>Statistics</Text>
           <View style={styles.stats}>
             <View>
-              <Text style={styles.score}>{userScore.played}</Text>
+              <Text style={styles.score}>{userScore?.played}</Text>
               <Text>Played</Text>
             </View>
             <View>
-              <Text style={styles.score}>{userScore.wins}</Text>
+              <Text style={styles.score}>{userScore?.wins}</Text>
               <Text>Wins</Text>
             </View>
             <View>
-              <Text style={styles.score}>{userScore.currentStreak}</Text>
+              <Text style={styles.score}>{userScore?.currentStreak}</Text>
               <Text>Current streak</Text>
             </View>
           </View>
