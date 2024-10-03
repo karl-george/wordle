@@ -17,6 +17,14 @@ import { allWords } from '@/utils/allWords';
 import { words } from '@/utils/targetWords';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SettingsModal from '@/components/SettingsModal';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  ZoomIn,
+} from 'react-native-reanimated';
 
 const ROWS = 6;
 const COLUMNS = 5;
@@ -91,14 +99,14 @@ const Page = () => {
 
     if (currentWord.length < word.length) {
       console.log('Not enough letters');
-      // Todo show error
+      shakeRow();
       return;
     }
 
     if (!allWords.includes(currentWord)) {
       console.log('Not a word');
-      // todo show error
-      // return
+      shakeRow();
+      // return;
     }
 
     const newGreenLetters: string[] = [];
@@ -160,6 +168,31 @@ const Page = () => {
     return Colors.light.gray;
   };
 
+  // Animations
+  const offsetShakes = Array.from({ length: ROWS }, () => useSharedValue(0));
+  const rowStyles = Array.from({ length: ROWS }, (_, index) =>
+    useAnimatedStyle(() => {
+      return {
+        transform: [
+          {
+            translateX: offsetShakes[index].value,
+          },
+        ],
+      };
+    })
+  );
+
+  const shakeRow = () => {
+    const TIME = 80;
+    const OFFSET = 10;
+
+    offsetShakes[currentRow].value = withSequence(
+      withTiming(-OFFSET, { duration: TIME / 2 }),
+      withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
+      withTiming(0, { duration: TIME / 2 })
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <SettingsModal ref={settingsModalRef} />
@@ -182,9 +215,13 @@ const Page = () => {
       />
       <View style={styles.gameField}>
         {rows.map((row, rowIndex) => (
-          <View key={`row-${rowIndex}`} style={styles.gameFieldRow}>
+          <Animated.View
+            key={`row-${rowIndex}`}
+            style={[styles.gameFieldRow, rowStyles[rowIndex]]}
+          >
             {row.map((cell, cellIndex) => (
-              <View
+              <Animated.View
+                entering={ZoomIn.delay(50 * cellIndex)}
                 key={`cell-${rowIndex}-${cellIndex}`}
                 style={[
                   styles.cell,
@@ -202,9 +239,9 @@ const Page = () => {
                 >
                   {cell}
                 </Text>
-              </View>
+              </Animated.View>
             ))}
-          </View>
+          </Animated.View>
         ))}
       </View>
       <OnScreenKeyboard
