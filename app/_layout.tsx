@@ -13,13 +13,20 @@ import {
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { Touchable, TouchableOpacity, useColorScheme } from 'react-native';
+import {
+  Appearance,
+  Touchable,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
 import { tokenCache } from '@/utils/cache';
 import Logo from '@/assets/images/nyt-logo.svg';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import { useMMKVBoolean } from 'react-native-mmkv';
+import { storage } from '@/utils/storage';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -32,6 +39,12 @@ SplashScreen.preventAutoHideAsync;
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [dark] = useMMKVBoolean('dark-mode', storage);
+
+  useEffect(() => {
+    Appearance.setColorScheme(dark ? 'dark' : 'light');
+  }, [dark]);
+
   let [fontsLoaded] = useFonts({
     FrankRuhlLibre_800ExtraBold,
     FrankRuhlLibre_500Medium,
