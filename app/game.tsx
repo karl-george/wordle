@@ -2,13 +2,15 @@ import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import OnScreenKeyboard, {
   BACKSPACE,
   ENTER,
 } from '../components/OnScreenKeyboard';
 import { allWords } from '@/utils/allWords';
 import { words } from '@/utils/targetWords';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import SettingsModal from '@/components/SettingsModal';
 
 const ROWS = 1;
 const COLUMNS = 5;
@@ -45,6 +47,10 @@ const Page = () => {
   const backgroundColor = Colors[colorScheme ?? 'light'].gameBg;
   const textColor = Colors[colorScheme ?? 'light'].text;
   const grayColor = Colors[colorScheme ?? 'light'].gray;
+
+  // Settings Modal
+  const settingsModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentSettingsModal = () => settingsModalRef.current?.present();
 
   const router = useRouter();
 
@@ -150,6 +156,7 @@ const Page = () => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <SettingsModal ref={settingsModalRef} />
       <Stack.Screen
         options={{
           headerRight: () => (
@@ -160,7 +167,9 @@ const Page = () => {
                 color={textColor}
               />
               <Ionicons name='podium-outline' size={28} color={textColor} />
-              <Ionicons name='settings-sharp' size={28} color={textColor} />
+              <TouchableOpacity onPress={handlePresentSettingsModal}>
+                <Ionicons name='settings-sharp' size={28} color={textColor} />
+              </TouchableOpacity>
             </View>
           ),
         }}
