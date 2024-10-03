@@ -1,3 +1,12 @@
+import Icon from '@/assets/images/wordle-icon.svg';
+import SubscribeModal from '@/components/SubscribeModal';
+import ThemedText from '@/components/ThemedText';
+import { Colors } from '@/constants/Colors';
+import { SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { format } from 'date-fns';
+import { Link } from 'expo-router';
+import { useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -5,15 +14,14 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import Icon from '@/assets/images/wordle-icon.svg';
-import { Link } from 'expo-router';
-import { format } from 'date-fns';
-import { Colors } from '@/constants/Colors';
-import ThemedText from '@/components/ThemedText';
-import { useRef } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import SubscribeModal from '@/components/SubscribeModal';
-import { SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInLeft,
+} from 'react-native-reanimated';
+
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function Index() {
   const colorScheme = useColorScheme();
@@ -29,13 +37,13 @@ export default function Index() {
     <View style={[styles.container, { backgroundColor }]}>
       <SubscribeModal ref={subscribeModalRef} />
       {/* Header */}
-      <View style={styles.header}>
+      <Animated.View style={styles.header} entering={FadeInDown}>
         <Icon width={100} height={70} />
         <ThemedText style={styles.title}>Wordle</ThemedText>
         <ThemedText style={styles.text}>
           Get 6 chances to guess a 5-letter word
         </ThemedText>
-      </View>
+      </Animated.View>
       {/* Menu Buttons */}
       <View style={styles.menu}>
         {/* Play */}
@@ -47,9 +55,9 @@ export default function Index() {
             { backgroundColor: colorScheme === 'light' ? '#000' : '#4a4a4a' },
           ]}
         >
-          <TouchableOpacity>
+          <AnimatedTouchableOpacity entering={FadeInLeft}>
             <Text style={[styles.btnText, styles.primaryText]}>Play</Text>
-          </TouchableOpacity>
+          </AnimatedTouchableOpacity>
         </Link>
         <SignedOut>
           {/* Login */}
@@ -58,36 +66,38 @@ export default function Index() {
             style={[styles.button, { borderColor: textColor }]}
             asChild
           >
-            <TouchableOpacity>
+            <AnimatedTouchableOpacity entering={FadeInLeft.delay(100)}>
               <ThemedText style={styles.btnText}>Log in</ThemedText>
-            </TouchableOpacity>
+            </AnimatedTouchableOpacity>
           </Link>
         </SignedOut>
         <SignedIn>
           {/* Log out */}
-          <TouchableOpacity
+          <AnimatedTouchableOpacity
+            entering={FadeInLeft.delay(200)}
             style={[styles.button, { borderColor: textColor }]}
             onPress={() => signOut()}
           >
             <ThemedText style={styles.btnText}>Sign out</ThemedText>
-          </TouchableOpacity>
+          </AnimatedTouchableOpacity>
         </SignedIn>
         {/* Subscribe */}
-        <TouchableOpacity
+        <AnimatedTouchableOpacity
+          entering={FadeInLeft.delay(300)}
           style={[styles.button, { borderColor: textColor }]}
           onPress={handlePresentSubscribeModal}
         >
           <ThemedText style={styles.btnText}>Subscribe</ThemedText>
-        </TouchableOpacity>
+        </AnimatedTouchableOpacity>
       </View>
       {/* Footer */}
-      <View style={styles.footer}>
+      <Animated.View style={styles.footer} entering={FadeIn.delay(300)}>
         <ThemedText style={styles.footerDate}>
           {format(new Date(), 'MMMM d, yyyy')}
         </ThemedText>
         <ThemedText style={styles.footerText}>No. 1151</ThemedText>
         <ThemedText style={styles.footerText}>Edited by Karl G</ThemedText>
-      </View>
+      </Animated.View>
     </View>
   );
 }
