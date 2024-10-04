@@ -1,7 +1,10 @@
+import SettingsModal from '@/components/SettingsModal';
 import { Colors } from '@/constants/Colors';
+import { allWords } from '@/utils/allWords';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,22 +12,19 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import OnScreenKeyboard, {
-  BACKSPACE,
-  ENTER,
-} from '../components/OnScreenKeyboard';
-import { allWords } from '@/utils/allWords';
-import { words } from '@/utils/targetWords';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import SettingsModal from '@/components/SettingsModal';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSequence,
   withTiming,
   ZoomIn,
 } from 'react-native-reanimated';
+import OnScreenKeyboard, {
+  BACKSPACE,
+  ENTER,
+} from '../components/OnScreenKeyboard';
 
 const ROWS = 6;
 const COLUMNS = 5;
@@ -109,6 +109,8 @@ const Page = () => {
       // return;
     }
 
+    flipRow();
+
     const newGreenLetters: string[] = [];
     const newYellowLetters: string[] = [];
     const newGrayLetters: string[] = [];
@@ -139,34 +141,34 @@ const Page = () => {
           `/end?win=false&word=${word}&gameField=${JSON.stringify(rows)}`
         );
       }
-    }, 0);
+    }, 1500);
 
     setCurrentRow(currentRow + 1);
     setCurrentColumn(0);
   };
 
-  const getCellColor = (cell: string, rowIndex: number, cellIndex: number) => {
-    if (currentRow > rowIndex) {
-      if (wordLetters[cellIndex] === cell) {
-        return Colors.light.green;
-      } else if (yellowLetters.includes(cell)) {
-        return Colors.light.yellow;
-      } else if (grayLetters.includes(cell)) {
-        return grayColor;
-      }
-    }
-    return 'transparent';
-  };
-  const getBorderColor = (
-    cell: string,
-    rowIndex: number,
-    cellIndex: number
-  ) => {
-    if (currentRow > rowIndex && cell !== '') {
-      return getCellColor(cell, rowIndex, cellIndex);
-    }
-    return Colors.light.gray;
-  };
+  // const getCellColor = (cell: string, rowIndex: number, cellIndex: number) => {
+  //   if (currentRow > rowIndex) {
+  //     if (wordLetters[cellIndex] === cell) {
+  //       return Colors.light.green;
+  //     } else if (yellowLetters.includes(cell)) {
+  //       return Colors.light.yellow;
+  //     } else if (grayLetters.includes(cell)) {
+  //       return grayColor;
+  //     }
+  //   }
+  //   return 'transparent';
+  // };
+  // const getBorderColor = (
+  //   cell: string,
+  //   rowIndex: number,
+  //   cellIndex: number
+  // ) => {
+  //   if (currentRow > rowIndex && cell !== '') {
+  //     return getCellColor(cell, rowIndex, cellIndex);
+  //   }
+  //   return Colors.light.gray;
+  // };
 
   // Animations
   const offsetShakes = Array.from({ length: ROWS }, () => useSharedValue(0));
@@ -191,6 +193,107 @@ const Page = () => {
       withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
       withTiming(0, { duration: TIME / 2 })
     );
+  };
+
+  // FLIP
+  const tileRotates = Array.from({ length: ROWS }, () =>
+    Array.from({ length: 5 }, () => useSharedValue(0))
+  );
+
+  const cellBackgrounds = Array.from({ length: ROWS }, () =>
+    Array.from({ length: 5 }, () => useSharedValue('transparent'))
+  );
+
+  const cellBorders = Array.from({ length: ROWS }, () =>
+    Array.from({ length: 5 }, () => useSharedValue(Colors.light.gray))
+  );
+
+  const tileStyles = Array.from({ length: ROWS }, (_, index) => {
+    return Array.from({ length: 5 }, (_, tileIndex) =>
+      useAnimatedStyle(() => {
+        return {
+          transform: [{ rotateX: `${tileRotates[index][tileIndex].value}deg` }],
+          borderColor: cellBorders[index][tileIndex].value,
+          backgroundColor: cellBackgrounds[index][tileIndex].value,
+        };
+      })
+    );
+  });
+
+  const flipRow = () => {
+    const TIME = 300;
+    const OFFSET = 90;
+
+    tileRotates[currentRow].forEach((value, index) => {
+      value.value = withDelay(
+        index * 100,
+        withSequence(
+          withTiming(OFFSET, { duration: TIME }, () => {}),
+          withTiming(0, { duration: TIME })
+        )
+      );
+    });
+  };
+
+  useEffect(() => {
+    if (currentRow === 0) {
+      return;
+    }
+
+    rows[currentRow - 1].forEach((value, index) => {
+      setCellColor(value, currentRow - 1, index);
+      setBorderColor(value, currentRow - 1, index);
+    });
+  }, [currentRow]);
+
+  const setCellColor = (cell: string, rowIndex: number, cellIndex: number) => {
+    if (currentRow >= rowIndex) {
+      if (wordLetters[cellIndex] === cell) {
+        cellBackgrounds[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(Colors.light.green)
+        );
+      } else if (wordLetters.includes(cell)) {
+        cellBackgrounds[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(Colors.light.yellow)
+        );
+      } else {
+        cellBackgrounds[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(grayColor)
+        );
+      }
+    } else {
+      cellBackgrounds[rowIndex][cellIndex].value = withTiming('transparent', {
+        duration: 100,
+      });
+    }
+  };
+  const setBorderColor = (
+    cell: string,
+    rowIndex: number,
+    cellIndex: number
+  ) => {
+    if (currentRow > rowIndex && cell !== '') {
+      if (wordLetters[cellIndex] === cell) {
+        cellBorders[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(Colors.light.green)
+        );
+      } else if (wordLetters.includes(cell)) {
+        cellBorders[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(Colors.light.yellow)
+        );
+      } else {
+        cellBorders[rowIndex][cellIndex].value = withDelay(
+          cellIndex * 200,
+          withTiming(grayColor)
+        );
+      }
+    }
+    return Colors.light.gray;
   };
 
   return (
@@ -225,10 +328,11 @@ const Page = () => {
                 key={`cell-${rowIndex}-${cellIndex}`}
                 style={[
                   styles.cell,
-                  {
-                    backgroundColor: getCellColor(cell, rowIndex, cellIndex),
-                    borderColor: getBorderColor(cell, rowIndex, cellIndex),
-                  },
+                  // {
+                  //   backgroundColor: getCellColor(cell, rowIndex, cellIndex),
+                  //   borderColor: getBorderColor(cell, rowIndex, cellIndex),
+                  // },
+                  tileStyles[rowIndex][cellIndex],
                 ]}
               >
                 <Text
